@@ -1,0 +1,26 @@
+package com.jian.community.domain.repository.crud;
+
+import com.jian.community.global.exception.ErrorMessage;
+import com.jian.community.application.exception.ResourceNotFoundException;
+import com.jian.community.domain.dto.CursorPage;
+import com.jian.community.domain.model.Comment;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+public interface CommentRepository {
+
+    Comment save(Comment comment);
+
+    Optional<Comment> findById(Long commentId);
+
+    List<Comment> findByPostId(Long postId);
+
+    void deleteById(Long commentId);
+
+    default Comment findByIdOrThrow(Long commentId) {
+        return findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.COMMENT_NOT_EXISTS));
+    }
+}
