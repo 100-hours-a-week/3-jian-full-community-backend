@@ -23,8 +23,8 @@ public class PostLikeService {
 
     @Transactional
     public void createPostLike(Long postId, Long userId) {
-        Post post = postRepository.findByIdOrThrow(postId);
-        User user = userRepository.findByIdOrThrow(userId);
+        Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
+        User user = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
 
         PostLike postLike = PostLike.of(post, user);
         postLikeRepository.save(postLike);
@@ -32,13 +32,13 @@ public class PostLikeService {
 
     @Transactional
     public void deletePostLike(Long postId, Long userId) {
-        Post post = postRepository.findByIdOrThrow(postId);
-        User user = userRepository.findByIdOrThrow(userId);
+        Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
+        User user = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
 
-        postLikeRepository.findByIdPostIdAndIdUserId(postId, userId)
+        postLikeRepository.findByIdPostIdAndIdUserIdAndIsDeletedFalse(postId, userId)
                 .ifPresent((postLike -> {
                     validateCommandPermission(post, user, postLike);
-                    postLikeRepository.deleteByIdPostIdAndIdUserId(post.getId(), user.getId());
+                    postLike.delete();
                 }));
     }
 

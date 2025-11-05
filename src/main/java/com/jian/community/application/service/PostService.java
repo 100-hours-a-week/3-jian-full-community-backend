@@ -21,7 +21,7 @@ public class PostService {
     private final UserRepository userRepository;
 
     public PostIdResponse createPost(Long userId, CreatePostRequest request) {
-        User writer = userRepository.findByIdOrThrow(userId);
+        User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
         Post post = Post.of(
                 writer,
                 request.title(),
@@ -37,26 +37,25 @@ public class PostService {
     }
 
     public void updatePost(Long userId, Long postId, UpdatePostRequest request) {
-        Post post = postRepository.findByIdOrThrow(postId);
-        User writer = userRepository.findByIdOrThrow(userId);
+        Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
+        User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
 
         validateCommandPermission(post, writer);
 
         post.update(request.title(), request.content(), request.postImageUrls());
-        postRepository.save(post);
     }
 
     public void deletePost(Long userId, Long postId) {
-        Post post = postRepository.findByIdOrThrow(postId);
-        User writer = userRepository.findByIdOrThrow(userId);
+        Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
+        User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
 
         validateCommandPermission(post, writer);
 
-        postRepository.deleteById(post.getId());
+        post.delete();
     }
 
     private void validateCommandPermission(Post post, User writer) {
-        if (post.isWrittenBy(writer)) {
+        if (!post.isWrittenBy(writer)) {
             throw new UnauthorizedWriterException(ErrorMessage.UNAUTHORIZED_POST_WRITER);
         }
     }

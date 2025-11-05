@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 
 public interface PostQueryRepository {
 
-    CursorPage<Post> findAllOrderByCreatedAtDesc(LocalDateTime cursor, int pageSize);
+    CursorPage<Post> findAllAndIsDeletedFalseOrderByCreatedAtDesc(LocalDateTime cursor, int pageSize);
 }

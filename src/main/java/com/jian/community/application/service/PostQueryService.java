@@ -36,12 +36,12 @@ public class PostQueryService {
     private final CommentService commentService;
 
     public CursorResponse<PostResponse> getPosts(LocalDateTime cursor) {
-        CursorPage<Post> page = postQueryRepository.findAllOrderByCreatedAtDesc(cursor, POST_PAGE_SIZE);
+        CursorPage<Post> page = postQueryRepository.findAllAndIsDeletedFalseOrderByCreatedAtDesc(cursor, POST_PAGE_SIZE);
 
         return CursorPageMapper.toCursorResponse(page, post -> {
-            User writer = userRepository.findByIdOrThrow(post.getUser().getId());
-            List<PostLike> likes = postLikeRepository.findByIdPostId(post.getId());
-            List<Comment> comments = commentRepository.findByPostId(post.getId());
+            User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(post.getUser().getId());
+            List<PostLike> likes = postLikeRepository.findByIdPostIdAndIsDeletedFalse(post.getId());
+            List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalse(post.getId());
             PostView view = postViewRepository.findByPostIdOrThrow(post.getId());
 
             return PostDtoMapper.toPostResponse(post, writer, likes.size(), comments.size(), view.getCount());
@@ -49,9 +49,9 @@ public class PostQueryService {
     }
 
     public PostDetailResponse getPostDetail(Long postId) {
-        Post post = postRepository.findByIdOrThrow(postId);
-        User writer = userRepository.findByIdOrThrow(post.getUser().getId());
-        List<PostLike> likes = postLikeRepository.findByIdPostId(postId);
+        Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
+        User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(post.getUser().getId());
+        List<PostLike> likes = postLikeRepository.findByIdPostIdAndIsDeletedFalse(postId);
         CursorResponse<CommentResponse> commentPreview = commentService.getRecentComments(postId);
         PostView view = postViewRepository.findByPostIdOrThrow(postId);
 

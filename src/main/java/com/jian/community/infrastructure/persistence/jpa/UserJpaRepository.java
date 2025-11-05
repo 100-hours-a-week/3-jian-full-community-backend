@@ -14,17 +14,14 @@ public interface UserJpaRepository extends UserRepository, JpaRepository<User, L
     User save(User user);
 
     @Override
-    Optional<User> findById(Long userId);
+    Optional<User> findByIdAndIsDeletedFalse(Long userId);
 
     @Override
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmailAndIsDeletedFalse(String email);
 
     @Override
-    void deleteById(Long userId);
+    boolean existsByEmailAndIsDeletedFalse(String email);
 
     @Override
-    boolean existsByEmail(String email);
-
-    @Override
-    boolean existsByNickname(String nickname);
+    boolean existsByNicknameAndIsDeletedFalse(String nickname);
 }

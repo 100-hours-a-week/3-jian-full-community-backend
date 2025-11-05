@@ -34,12 +34,12 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public CursorResponse<CommentResponse> getComments(Long postId, LocalDateTime cursor) {
-        Post post = postRepository.findByIdOrThrow(postId);
+        Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
         CursorPage<Comment> page = commentQueryRepository
-                .findAllByPostIdOrderByCreatedAtDesc(post.getId(), cursor, COMMENT_PAGE_SIZE);
+                .findAllByPostIdAndIsDeletedFalseOrderByCreatedAtDesc(post.getId(), cursor, COMMENT_PAGE_SIZE);
 
         return CursorPageMapper.toCursorResponse(page, comment -> {
-            User writer = userRepository.findByIdOrThrow(comment.getUser().getId());
+            User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(comment.getUser().getId());
 
             return CommentDtoMapper.toCommentResponse(comment, writer);
         });
@@ -52,10 +52,10 @@ public class CommentService {
 
     @Transactional
     public CommentResponse creatComment(Long postId, Long userId, CreateCommentRequest request) {
-        Post post = postRepository.findByIdOrThrow(postId);
-        User writer = userRepository.findByIdOrThrow(userId);
-        Comment comment = Comment.of(post, writer, request.content());
+        Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
+        User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
 
+        Comment comment = Comment.of(post, writer, request.content());
         Comment saved = commentRepository.save(comment);
 
         return new CommentResponse(
@@ -70,25 +70,24 @@ public class CommentService {
 
     @Transactional
     public void updateComment(Long postId, Long commentId, Long userId, UpdateCommentRequest request) {
-        Post post = postRepository.findByIdOrThrow(postId);
-        Comment comment = commentRepository.findByIdOrThrow(commentId);
-        User writer = userRepository.findByIdOrThrow(userId);
+        Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
+        Comment comment = commentRepository.findByIdAndIsDeletedFalseOrThrow(commentId);
+        User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
 
         validateCommandPermission(post, comment, writer);
 
         comment.update(request.content());
-        commentRepository.save(comment);
     }
 
     @Transactional
     public void deleteComment(Long postId, Long commentId, Long userId) {
-        Post post = postRepository.findByIdOrThrow(postId);
-        Comment comment = commentRepository.findByIdOrThrow(commentId);
-        User writer = userRepository.findByIdOrThrow(userId);
+        Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
+        Comment comment = commentRepository.findByIdAndIsDeletedFalseOrThrow(commentId);
+        User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
 
         validateCommandPermission(post, comment, writer);
 
-        commentRepository.deleteById(commentId);
+        comment.delete();
     }
 
     private void validateCommandPermission(Post post, Comment comment, User writer) {

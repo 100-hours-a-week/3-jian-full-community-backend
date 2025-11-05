@@ -15,8 +15,5 @@ public interface PostJpaRepository extends PostRepository, JpaRepository<Post, P
     Post save(Post post);
 
     @Override
-    Optional<Post> findById(Long postId);
-
-    @Override
-    void deleteById(Long postId);
+    Optional<Post> findByIdAndIsDeletedFalse(Long postId);
 }

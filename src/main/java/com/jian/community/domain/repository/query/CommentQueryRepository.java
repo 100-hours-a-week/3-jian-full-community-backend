@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 
 public interface CommentQueryRepository {
 
-    CursorPage<Comment> findAllByPostIdOrderByCreatedAtDesc(Long postId, LocalDateTime cursor, int pageSize);
+    CursorPage<Comment> findAllByPostIdAndIsDeletedFalseOrderByCreatedAtDesc(Long postId, LocalDateTime cursor, int pageSize);
 }

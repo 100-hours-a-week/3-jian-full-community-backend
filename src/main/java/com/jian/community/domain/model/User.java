@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -28,7 +26,7 @@ public class User extends MinimalEntity {
     private String profileImageUrl;
 
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = Boolean.FALSE;
+    private Boolean isDeleted = false;
 
     public static User of(String email, String password, String nickname, String profileImageUrl) {
         User user = new User();
@@ -45,15 +43,5 @@ public class User extends MinimalEntity {
 
     public void changePassword(String password) { this.password = password; }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User that)) return false;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public void delete() { this.isDeleted = true; }
 }

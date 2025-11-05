@@ -19,9 +19,10 @@ public class PostQueryDslRepository implements PostQueryRepository {
     private final QPost qPost = QPost.post;
 
     @Override
-    public CursorPage<Post> findAllOrderByCreatedAtDesc(LocalDateTime cursor, int pageSize) {
+    public CursorPage<Post> findAllAndIsDeletedFalseOrderByCreatedAtDesc(LocalDateTime cursor, int pageSize) {
         List<Post> results = jpaQueryFactory.selectFrom(qPost)
                 .where(
+                        qPost.isDeleted.isFalse(),
                         cursor != null ?
                                 qPost.createdAt.before(cursor)
                                 : null // 조건 없음

@@ -19,10 +19,11 @@ public class CommentQueryDslRepository implements CommentQueryRepository {
     private final QComment qComment = QComment.comment;
 
     @Override
-    public CursorPage<Comment> findAllByPostIdOrderByCreatedAtDesc(Long postId, LocalDateTime cursor, int pageSize) {
+    public CursorPage<Comment> findAllByPostIdAndIsDeletedFalseOrderByCreatedAtDesc(Long postId, LocalDateTime cursor, int pageSize) {
         List<Comment> results = queryFactory.selectFrom(qComment)
                 .where(
                         qComment.post.id.eq(postId),
+                        qComment.isDeleted.isFalse(),
                         cursor != null ?
                                 qComment.createdAt.before(cursor)
                                 : null // 조건 없음

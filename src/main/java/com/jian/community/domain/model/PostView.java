@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -25,17 +23,5 @@ public class PostView {
         PostView postView = new PostView();
         postView.postId = postId;
         return postView;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PostView that)) return false;
-        return Objects.equals(postId, that.postId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(postId);
     }
 }

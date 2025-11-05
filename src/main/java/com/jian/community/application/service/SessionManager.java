@@ -1,5 +1,6 @@
 package com.jian.community.application.service;
 
+import com.jian.community.domain.event.UserDeleteEvent;
 import com.jian.community.domain.exception.SessionExpiredException;
 import com.jian.community.domain.model.UserSession;
 import com.jian.community.domain.repository.crud.UserSessionRepository;
@@ -9,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -17,7 +20,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class SessionManager {
 
@@ -26,6 +28,7 @@ public class SessionManager {
 
     private final UserSessionRepository userSessionRepository;
 
+    @Transactional
     public void createSession(Long userId, HttpServletResponse httpResponse) {
         String sessionId = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
@@ -43,6 +46,7 @@ public class SessionManager {
         httpResponse.addCookie(cookie);
     }
 
+    @Transactional
     public UserSession getValidSession(HttpServletRequest httpRequest) {
         UserSession session = getSession(httpRequest);
 
@@ -54,6 +58,7 @@ public class SessionManager {
         return extendSession(session);
     }
 
+    @Transactional(readOnly = true)
     public UserSession getSession(HttpServletRequest httpRequest) {
         Optional<UserSession> session = getSessionId(httpRequest)
                 .flatMap(userSessionRepository::findById);
@@ -61,18 +66,24 @@ public class SessionManager {
         return session.orElseThrow(SessionExpiredException::new);
     }
 
+    @Transactional
     public void expireSession(HttpServletRequest httpRequest) {
         getSessionId(httpRequest)
                 .ifPresent(this::expireSession);
     }
 
-    public void expireSession(String sessionId) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void expireSession(UserDeleteEvent event) {
+        userSessionRepository.findByUserId(event.userId())
+                .forEach(session -> expireSession(session.getId()));
+    }
+
+    private void expireSession(String sessionId) {
         userSessionRepository.deleteById(sessionId);
     }
 
     private UserSession extendSession(UserSession session) {
         LocalDateTime now = LocalDateTime.now();
-
         session.extendSession(now, SESSION_TTL);
         return userSessionRepository.save(session);
     }

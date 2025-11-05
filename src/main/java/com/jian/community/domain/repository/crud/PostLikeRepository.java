@@ -9,9 +9,7 @@ public interface PostLikeRepository {
 
     PostLike save(PostLike postLike);
 
-    List<PostLike> findByIdPostId(Long postId);
+    List<PostLike> findByIdPostIdAndIsDeletedFalse(Long postId);
 
-    Optional<PostLike> findByIdPostIdAndIdUserId(Long postId, Long userId);
-
-    void deleteByIdPostIdAndIdUserId(Long postId, Long userId);
+    Optional<PostLike> findByIdPostIdAndIdUserIdAndIsDeletedFalse(Long postId, Long userId);
 }

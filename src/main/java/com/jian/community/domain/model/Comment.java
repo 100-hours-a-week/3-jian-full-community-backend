@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -29,7 +27,7 @@ public class Comment extends MinimalEntity {
     private Integer depth = 0;
 
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = Boolean.FALSE;
+    private Boolean isDeleted = false;
 
     public static Comment of(Post post, User user, String content) {
         Comment comment = new Comment();
@@ -51,15 +49,5 @@ public class Comment extends MinimalEntity {
         return this.user.equals(writer);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Comment that)) return false;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public void delete() { this.isDeleted = true; }
 }

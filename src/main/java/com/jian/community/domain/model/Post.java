@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -32,7 +31,7 @@ public class Post extends MinimalEntity {
     private List<String> postImageUrls = new ArrayList<>();
 
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = Boolean.FALSE;
+    private Boolean isDeleted = false;
 
     public static Post of(User user, String title, String content, List<String> postImageUrls) {
         Post post = new Post();
@@ -50,18 +49,8 @@ public class Post extends MinimalEntity {
     }
 
     public boolean isWrittenBy(User writer){
-        return user != null && user.equals(writer);
+        return this.user.equals(writer);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Post that)) return false;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public void delete() { this.isDeleted = true; }
 }

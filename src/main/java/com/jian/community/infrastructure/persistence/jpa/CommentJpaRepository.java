@@ -15,11 +15,8 @@ public interface CommentJpaRepository extends CommentRepository, JpaRepository<C
     Comment save(Comment comment);
 
     @Override
-    Optional<Comment> findById(Long commentId);
+    Optional<Comment> findByIdAndIsDeletedFalse(Long commentId);
 
     @Override
-    List<Comment> findByPostId(Long postId);
-
-    @Override
-    void deleteById(Long commentId);
+    List<Comment> findByPostIdAndIsDeletedFalse(Long postId);
 }

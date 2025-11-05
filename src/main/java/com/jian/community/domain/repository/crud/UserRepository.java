@@ -10,18 +10,16 @@ public interface UserRepository {
 
     User save(User user);
 
-    Optional<User> findById(Long userId);
+    Optional<User> findByIdAndIsDeletedFalse(Long userId);
 
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmailAndIsDeletedFalse(String email);
 
-    void deleteById(Long userId);
+    boolean existsByEmailAndIsDeletedFalse(String email);
 
-    boolean existsByEmail(String email);
+    boolean existsByNicknameAndIsDeletedFalse(String nickname);
 
-    boolean existsByNickname(String nickname);
-
-    default User findByIdOrThrow(Long userId) {
-        return findById(userId)
+    default User findByIdAndIsDeletedFalseOrThrow(Long userId) {
+        return findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.USER_NOT_EXISTS));
     }
 }

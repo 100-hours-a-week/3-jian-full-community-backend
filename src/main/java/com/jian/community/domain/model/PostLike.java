@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -27,9 +25,15 @@ public class PostLike {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
     public static PostLike of(Post post, User user) {
-        PostLikeId id = PostLikeId.of(post.getId(), user.getId());
-        return new PostLike(id, post, user);
+        PostLike postLike = new PostLike();
+        postLike.id = PostLikeId.of(post.getId(), user.getId());
+        postLike.post = post;
+        postLike.user = user;
+        return postLike;
     }
 
     public boolean isBelongsTo(Post post) {
@@ -40,15 +44,5 @@ public class PostLike {
         return this.user.equals(user);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PostLike that)) return false;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public void delete() { this.isDeleted = true; }
 }

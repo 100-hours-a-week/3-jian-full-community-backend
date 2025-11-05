@@ -15,11 +15,8 @@ public interface PostLikeJpaRepository extends PostLikeRepository, JpaRepository
     PostLike save(PostLike postLike);
 
     @Override
-    List<PostLike> findByIdPostId(Long postId);
+    List<PostLike> findByIdPostIdAndIsDeletedFalse(Long postId);
 
     @Override
-    Optional<PostLike> findByIdPostIdAndIdUserId(Long postId, Long userId);
-
-    @Override
-    void deleteByIdPostIdAndIdUserId(Long postId, Long userId);
+    Optional<PostLike> findByIdPostIdAndIdUserIdAndIsDeletedFalse(Long postId, Long userId);
 }
