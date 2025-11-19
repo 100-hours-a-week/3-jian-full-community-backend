@@ -9,7 +9,6 @@ public record ChangePasswordRequest(
 
         @Schema(example = "password00!!")
         @NotBlank(message = ValidationMessage.PASSWORD_REQUIRED)
-        @PasswordFormat
         String oldPassword,
 
         @Schema(example = "password00??")

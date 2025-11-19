@@ -37,8 +37,9 @@ public class User extends MinimalEntity {
         return user;
     }
 
-    public void update(String nickname) {
+    public void update(String nickname, String profileImageUrl) {
         this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void changePassword(String password) { this.password = password; }

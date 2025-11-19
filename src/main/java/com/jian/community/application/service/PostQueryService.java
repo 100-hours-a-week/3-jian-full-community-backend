@@ -48,18 +48,25 @@ public class PostQueryService {
         });
     }
 
-    public PostDetailResponse getPostDetail(Long postId) {
+    public PostDetailResponse getPostDetail(Long postId, Long userId) {
         Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
         User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(post.getUser().getId());
+        User reader = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
+
         List<PostLike> likes = postLikeRepository.findByIdPostIdAndIsDeletedFalse(postId);
-        CursorResponse<CommentResponse> commentPreview = commentService.getRecentComments(postId);
+        List<Comment> comments = commentRepository.findByPostIdAndIsDeletedFalse(postId);
         PostView view = postViewRepository.findByPostIdOrThrow(postId);
+        CursorResponse<CommentResponse> commentPreview = commentService.getRecentComments(postId, userId);
+
+        Boolean isWriter = post.isWrittenBy(reader);
+        Boolean isLiked = likes.stream()
+                .anyMatch(postLike -> postLike.getUser().getId().equals(reader.getId()));
 
         eventPublisher.publishEvent(new PostViewEvent(postId)); // 게시글 조회 이벤트 발행
 
         return PostDtoMapper.toPostDetailResponse(
-                post, writer,
-                likes.size(), commentPreview.getItems().size(), view.getCount(),
+                post, writer, isWriter, isLiked,
+                likes.size(), comments.size(), view.getCount(),
                 commentPreview
         );
     }

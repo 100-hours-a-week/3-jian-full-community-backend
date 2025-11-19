@@ -9,6 +9,8 @@ public record PostDetailResponse(
         String title,
         String writerNickname,
         String writerProfileImageUrl,
+        Boolean isWriter,
+        Boolean isLiked,
         Integer likeCount,
         Integer commentCount,
         Integer viewCount,

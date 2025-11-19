@@ -44,9 +44,10 @@ public class CommentController {
     @ResponseStatus(HttpStatus.OK)
     public CursorResponse<CommentResponse> getComments(
             @PathVariable Long postId,
+            @RequestAttribute Long userId,
             @RequestParam(required = false) LocalDateTime cursor
     ) {
-        return commentService.getComments(postId, cursor);
+        return commentService.getComments(postId, userId, cursor);
     }
 
     @Operation(summary = "댓글 생성")

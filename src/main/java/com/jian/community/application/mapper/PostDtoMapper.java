@@ -27,22 +27,17 @@ public class PostDtoMapper {
     }
 
     public static PostDetailResponse toPostDetailResponse(
-            Post post, User writer,
+            Post post, User writer, Boolean isWriter, Boolean isLiked,
             Integer likeCount, Integer commentCount, Integer viewCount,
             CursorResponse<CommentResponse> commentPreview
     ) {
+
         return new PostDetailResponse(
-                post.getId(),
-                post.getTitle(),
-                writer.getNickname(),
-                writer.getProfileImageUrl(),
-                likeCount,
-                commentCount,
-                viewCount,
-                post.getCreatedAt(),
-                post.getUpdatedAt(),
-                post.getContent(),
-                post.getPostImageUrls(),
+                post.getId(), post.getTitle(),
+                writer.getNickname(), writer.getProfileImageUrl(),
+                isWriter, isLiked,
+                likeCount, commentCount, viewCount,
+                post.getCreatedAt(), post.getUpdatedAt(), post.getContent(), post.getPostImageUrls(),
                 commentPreview
         );
     }

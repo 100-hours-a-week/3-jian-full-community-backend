@@ -56,9 +56,10 @@ public class PostController {
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public PostDetailResponse getPostDetail(
-            @PathVariable Long postId
+            @PathVariable Long postId,
+            @RequestAttribute Long userId
     ) {
-        return postQueryService.getPostDetail(postId);
+        return postQueryService.getPostDetail(postId, userId);
     }
 
     @Operation(summary = "게시글 생성")

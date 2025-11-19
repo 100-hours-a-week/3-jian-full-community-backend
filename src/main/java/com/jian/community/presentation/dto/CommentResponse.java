@@ -7,6 +7,7 @@ public record CommentResponse(
         Long id,
         String writerNickname,
         String writerProfileImageUrl,
+        Boolean isWriter,
         String content,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

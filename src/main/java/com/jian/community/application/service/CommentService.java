@@ -33,21 +33,24 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public CursorResponse<CommentResponse> getComments(Long postId, LocalDateTime cursor) {
+    public CursorResponse<CommentResponse> getComments(Long postId, Long userId, LocalDateTime cursor) {
         Post post = postRepository.findByIdAndIsDeletedFalseOrThrow(postId);
         CursorPage<Comment> page = commentQueryRepository
                 .findAllByPostIdAndIsDeletedFalseOrderByCreatedAtDesc(post.getId(), cursor, COMMENT_PAGE_SIZE);
 
+        User reader = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
+
         return CursorPageMapper.toCursorResponse(page, comment -> {
             User writer = userRepository.findByIdAndIsDeletedFalseOrThrow(comment.getUser().getId());
+            boolean isWriter = comment.isWrittenBy(reader);
 
-            return CommentDtoMapper.toCommentResponse(comment, writer);
+            return CommentDtoMapper.toCommentResponse(comment, writer, isWriter);
         });
     }
 
     @Transactional(readOnly = true)
-    public CursorResponse<CommentResponse> getRecentComments(Long postId) {
-        return getComments(postId, null);
+    public CursorResponse<CommentResponse> getRecentComments(Long postId, Long userId) {
+        return getComments(postId, userId, null);
     }
 
     @Transactional
@@ -62,6 +65,7 @@ public class CommentService {
                 saved.getId(),
                 writer.getNickname(),
                 writer.getProfileImageUrl(),
+                true,
                 saved.getContent(),
                 saved.getCreatedAt(),
                 saved.getUpdatedAt()

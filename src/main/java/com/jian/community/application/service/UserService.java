@@ -72,7 +72,7 @@ public class UserService {
     @Transactional
     public UserInfoResponse updateUserInfo(Long userId, UpdateUserRequest request) {
         User user = userRepository.findByIdAndIsDeletedFalseOrThrow(userId);
-        user.update(request.nickname());
+        user.update(request.nickname(), request.profileImageUrl());
 
         return new UserInfoResponse(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
     }
